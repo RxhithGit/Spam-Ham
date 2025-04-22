@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Message Categories</title>
+  <style>
+      body {
+          background: url('download.jpeg') no-repeat center center fixed;
+          background-size: cover;
+          position: relative;
+      }
+      body::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+      }
+      .container {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: rgba(255, 255, 255, 0.8);
+          padding: 20px;
+          border-radius: 10px;
+          text-align: center;
+          z-index: 1;
+      }
+      .category {
+          margin-top: 20px;
+          padding: 10px;
+          background: white;
+          border-radius: 5px;
+      }
+  </style>
+</head>
+<body>
+  <div class="container">
+      <h2>Message Categories</h2>
+      <div id="bank" class="category" style="display:none;">
+          <h3>Bank</h3>
+          <p id="bank_text"></p>
+      </div>
+      <div id="social" class="category" style="display:none;">
+          <h3>Social</h3>
+          <p id="social_text"></p>
+      </div>
+      <div id="others" class="category" style="display:none;">
+          <h3>Others</h3>
+          <p id="others_text"></p>
+      </div>
+  </div>
+
+  <script>
+      document.addEventListener("DOMContentLoaded", function() {
+          const params = new URLSearchParams(window.location.search);
+          const message = params.get("text");
+
+          if (!message) {
+              alert("No message found. Redirecting...");
+              window.location.href = "/";
+              return;
+          }
+
+          fetch('http://127.0.0.1:5000/categorize', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ text: message })
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.category === 'bank') {
+                  document.getElementById('bank_text').innerText = message;
+                  document.getElementById('bank').style.display = 'block';
+              } else if (data.category === 'social') {
+                  document.getElementById('social_text').innerText = message;
+                  document.getElementById('social').style.display = 'block';
+              } else {
+                  document.getElementById('others_text').innerText = message;
+                  document.getElementById('others').style.display = 'block';
+              }
+          });
+      });
+  </script>
+</body>
+</html>
